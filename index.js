@@ -20,6 +20,21 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+const verifyJwt =(req,res,next)=>{
+     const authorization = req.headers.authorization;
+     if(!authorization){
+          return res.status(401).send({error:true, message:"Unauthorize Access"})
+     }
+     // bearer token
+     const token = authorization.split(' ')[1]
+     jwt.verify(token , process.env.Access_Token, (err, decoded)=>{
+          if(err){
+               return res.status(401).send({error:true, message:"Unauthorize Access"})
+          }
+          req.decoded = decoded;
+          next()
+     })
+}
 
 async function run() {
   try {
@@ -74,16 +89,19 @@ async function run() {
           res.send(result)
      })
      // cart collection api
-     app.get('/carts', async (req,res)=>{
+     app.get('/carts',verifyJwt, async (req,res)=>{
           const email = req.query.email;
           if(!email){
              res.send([])
           }
-          else{
+          const decodedEmail = req.decoded.email;
+          if(email !== decodedEmail){
+               return req.status(401).send({error:true, message:"Forbidden Access"})
+          }
                const query = {email : email};
                const result = await cartCollection.find(query).toArray();
                res.send(result)
-          }
+          
      })
      // delate api
      app.delete('/carts/:id', async (req, res) => {
