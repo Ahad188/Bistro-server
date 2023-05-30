@@ -89,20 +89,18 @@ async function run() {
           res.send(result)
      })
      // cart collection api
-     app.get('/carts',verifyJwt, async (req,res)=>{
+     app.get('/carts',   async (req, res) => {
           const email = req.query.email;
-          if(!email){
-             res.send([])
+    
+          if (!email) {
+            res.send([]);
           }
-          const decodedEmail = req.decoded.email;
-          if(email !== decodedEmail){
-               return req.status(401).send({error:true, message:"Forbidden Access"})
-          }
-               const query = {email : email};
-               const result = await cartCollection.find(query).toArray();
-               res.send(result)
+    
           
-     })
+          const query = { email: email };
+          const result = await cartCollection.find(query).toArray();
+          res.send(result);
+        });
      // delate api
      app.delete('/carts/:id', async (req, res) => {
           const id = req.params.id;
@@ -110,10 +108,9 @@ async function run() {
           const result = await cartCollection.deleteOne(query);
           res.send(result);
         })
-
+// post cart
      app.post('/carts', async (req,res)=>{
           const item = req.body;
-          // console.log(item);
           const result = await cartCollection.insertOne(item)
           res.send(result)
      })
