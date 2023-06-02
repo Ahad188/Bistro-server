@@ -169,6 +169,7 @@ async function run() {
           const id = req.params.id;
           const query = { _id: new ObjectId(id) };
           const result = await cartCollection.deleteOne(query);
+          // console.log(" delet cart " ,result);
           res.send(result);
         })
 // post cart
@@ -199,6 +200,7 @@ async function run() {
 
      const query = {_id : {$in: payment.cartItems.map(id => new ObjectId(id))}}
      const delateResult = await cartCollection.deleteMany(query)
+     console.log("result 343423",delateResult);
 
       
 
