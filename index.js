@@ -200,15 +200,28 @@ async function run() {
 
      const query = {_id : {$in: payment.cartItems.map(id => new ObjectId(id))}}
      const delateResult = await cartCollection.deleteMany(query)
+
      console.log("result 343423",delateResult);
-
-      
-
-    
-
      res.send({ insertResult, delateResult});
    })
 
+//    admin dashboard api
+
+   app.get('/admin-status',verifyJWT,verifyAdmin, async(req,res)=>{
+     const user = await usersCollection.estimatedDocumentCount();
+     const product = await  menuCollection.estimatedDocumentCount();
+     const order = await paymentCollection.estimatedDocumentCount();
+
+     const payments = await paymentCollection.find().toArray()
+     const revenue = payments.reduce((sum,payment)=>sum + payment.price,0)
+     
+     res.send({
+          revenue,
+          user,
+          product,
+          order,
+     })
+   })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
